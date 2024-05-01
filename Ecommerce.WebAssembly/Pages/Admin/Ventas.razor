@@ -1,0 +1,75 @@
+﻿@page "/ventas"
+
+@inject IVentaService ventaServicio
+@inject IUserService userService
+@inject IProductService productService
+
+<div class="row justify-content-center mt-3 mb-4">
+
+    <div class="col-sm-6 col-md-8 col-xl-9">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Ingrese nombre del comprador" @bind-value="buscar">
+            <button class="btn btn-outline-secondary" type="button" @onclick="(async () => await  ObtenerVentas(buscar))">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Id Venta</th>
+                    <th scope="col">Id Usuario</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (lista != null)
+                {
+                    foreach (var venta in lista)
+                    {
+                        <tr>
+                            <td>@venta.IdVenta</td>
+                            <td>@venta.IdUsuario</td>
+                            <td>@venta.Total</td>
+                            <td>
+                                @foreach (var detalleVenta in venta.DetalleVenta)
+                                {
+                                    <div>detalleVenta</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@code {
+    private List<VentaDTO>? lista = null;
+    private string buscar = "";
+
+    private async Task ObtenerVentas(string valor = "")
+    {
+        var respuesta = await ventaServicio.Lista(valor);
+
+        if (respuesta.EsCorrecto)
+        {
+            lista = (List<VentaDTO>)respuesta.Resultado!;
+        }
+        else
+        {
+            lista = new List<VentaDTO>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerVentas();
+    }
+
+}
